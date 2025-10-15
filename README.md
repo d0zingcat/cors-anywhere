@@ -152,21 +152,66 @@ export CORSANYWHERE_WHITELIST=https://example.com,http://example.com,http://exam
 node server.js
 ```
 
-This application can immediately be run on Heroku, see https://devcenter.heroku.com/articles/nodejs
-for instructions. Note that their [Acceptable Use Policy](https://www.heroku.com/policy/aup) forbids
-the use of Heroku for operating an open proxy, so make sure that you either enforce a whitelist as
-shown above, or severly rate-limit the number of requests.
 
-For example, to blacklist abuse.example.com and rate-limit everything to 50 requests per 3 minutes,
-except for my.example.com and my2.example.com (which may be unlimited), use:
+## Vercel Deployment
 
+CORS Anywhere can be deployed on Vercel using serverless functions. The project includes
+configuration files for easy deployment.
+
+### Quick Deploy
+
+1. **Install Vercel CLI** (if not already installed):
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Login to Vercel**:
+   ```bash
+   vercel login
+   ```
+
+3. **Deploy**:
+   ```bash
+   npm run deploy
+   ```
+   or
+   ```bash
+   vercel --prod
+   ```
+
+### Configuration
+
+The deployment uses:
+- `api/index.js` - Serverless function entry point
+- `vercel.json` - Vercel configuration with routing and function settings
+
+### Environment Variables
+
+You can configure CORS Anywhere using environment variables in your Vercel project:
+
+- `CORSANYWHERE_WHITELIST` - Comma-separated list of allowed origins
+- `CORSANYWHERE_BLACKLIST` - Comma-separated list of blocked origins  
+- `CORSANYWHERE_RATELIMIT` - Rate limiting configuration
+
+Example:
 ```
-export PORT=8080
-export CORSANYWHERE_BLACKLIST=https://abuse.example.com,http://abuse.example.com
-export CORSANYWHERE_RATELIMIT='50 3 my.example.com my2.example.com'
-node server.js
+CORSANYWHERE_WHITELIST=https://myapp.com,https://myapp.vercel.app
+CORSANYWHERE_RATELIMIT=100 5 myapp.com
 ```
 
+### Important Notes
+
+- Vercel serverless functions have execution time limits (30 seconds by default)
+- Large file downloads may timeout
+- Consider upgrading to Vercel Pro for longer function timeouts if needed
+- Rate limiting and origin restrictions are recommended to prevent abuse
+
+### Usage
+
+After deployment, your CORS proxy will be available at your Vercel domain:
+```
+https://your-project.vercel.app/http://example.com/api/data
+```
 
 ## License
 
